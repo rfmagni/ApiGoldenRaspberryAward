@@ -27,7 +27,7 @@ Os rests disponíveis na aplicação são:
 * Criar: `POST/api/v1/goldenraspberryaward`
 * Editar (by id): `PUT/api/v1/goldenraspberryaward/1`
 * Apagar (by id): `DELETE/api/v1/goldenraspberryaward/1`
-* Editar Parcial (by id): `PATCH/api/v1/goldenraspberryaward/1`
+* Editar Parcial (by id): `PATCH/api/v1/goldenraspberryaward/updateYear/1`
 * Localizar Intervalos: `GET/api/v1/goldenraspberryaward/intervalaward`
 
 ### Detalhamento do Rest
@@ -55,6 +55,24 @@ Os rests disponíveis na aplicação são:
 ```
 
 `DELETE/api/v1/goldenraspberryaward/1`
+
+**Body:**
+
+```
+Não precisa enviar nada no body.
+```
+
+`PATCH/api/v1/goldenraspberryaward/updateYear/1`
+
+**Body:**
+
+```json
+{
+  "year": 1994
+}
+```
+
+`GET/api/v1/goldenraspberryaward/intervalaward`
 
 **Body:**
 
