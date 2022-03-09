@@ -58,9 +58,6 @@ Os rests disponíveis na aplicação são:
 
 **Body:**
 
-```json
-{
-  "idMovie": 26,
-  "year": 1994
-}
+```
+Não precisa enviar nada no body.
 ```
