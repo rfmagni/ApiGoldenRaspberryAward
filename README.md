@@ -6,7 +6,7 @@
 
 ### Compilação a aplicação
 
-* Para executar a compilação da aplica, pode-se rodar o comando abaixo:
+* Para executar a compilação da aplicação, pode-se rodar o comando abaixo:
 
 ```bash
 mvn install
