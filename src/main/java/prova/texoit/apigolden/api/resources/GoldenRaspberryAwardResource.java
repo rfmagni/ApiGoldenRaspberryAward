@@ -53,7 +53,7 @@ public class GoldenRaspberryAwardResource {
 				HttpStatus.OK);
 	}
 	
-	@PatchMapping(path = "/{id}")
+	@PatchMapping(path = "/updateYear/{id}")
 	public ResponseEntity<GoldenRaspberryAwardDTO> updateYear(@PathVariable("id") Long id, @RequestBody GoldenRaspberryAwardDTO dto) {
 		GoldenRaspberryAward goldenRaspberryAward = goldenRaspberryAwardService.findByIdOrElseThrow(id);
 		goldenRaspberryAward.setYear(dto.getYear());
