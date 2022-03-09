@@ -22,6 +22,7 @@ mvn spring-boot:run
 
 ## Rests Disponíveis
 
+Oara chanmar os rests localmente, pode-se usar a porta 8080. Ex: localhost:8080/api/v1/goldenraspberryaward/44
 Os rests disponíveis na aplicação são:
 
 * Criar: `POST/api/v1/goldenraspberryaward`
