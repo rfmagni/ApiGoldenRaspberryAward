@@ -4,6 +4,14 @@
 * java : 8
 * maven: 3.8.4
 
+### Compilação a aplicação
+
+* Para executar a compilação da aplica, pode-se rodar o comando abaixo:
+
+```bash
+mvn install
+```
+
 ### Test
 
 * Para executar os testes, pode-se rodar o comando abaixo:
