@@ -16,6 +16,7 @@ import prova.texoit.apigolden.api.dto.IntervalAwardDTO;
 import prova.texoit.apigolden.api.dto.IntervalGoldenRaspberryAwardDTO;
 import prova.texoit.apigolden.api.entities.GoldenRaspberryAward;
 import prova.texoit.apigolden.api.entities.Movie;
+import prova.texoit.apigolden.api.entities.MovieProducer;
 import prova.texoit.apigolden.api.entities.Producer;
 import prova.texoit.apigolden.api.entities.Studio;
 import prova.texoit.apigolden.api.repository.GoldenRaspberryAwardRepository;
@@ -32,6 +33,9 @@ public class GoldenRaspberryAwardService {
 
 	@Autowired
 	private MovieService movieService;
+	
+	@Autowired
+	private MovieProducerService movieProducerService;
 
 	@Autowired
 	private GoldenRaspberryAwardRepository goldenRaspberryAwardRepository;
@@ -41,11 +45,11 @@ public class GoldenRaspberryAwardService {
 
 		for (MovieBean movieBean : movies) {
 
-			Producer producer = saveProducer(movieBean);
+			List<Producer> producers = saveProducer(movieBean);
 
 			Studio studio = saveStudio(movieBean);
 
-			Movie movie = saveMovie(movieBean, producer, studio);
+			Movie movie = saveMovie(movieBean, producers, studio);
 
 			saveGoldenRaspberryAward(movieBean, movie);
 		}
@@ -108,33 +112,42 @@ public class GoldenRaspberryAwardService {
 		HashMap<Integer, List<IntervalAwardDTO>> mapIntervalAwards = new HashMap<Integer, List<IntervalAwardDTO>>();
 
 		for (GoldenRaspberryAward award : awards) {
-			Producer producerAward = award.getMovie().getProducer();
-
+			
 			awardsSub.remove(award);
 			
 			for (GoldenRaspberryAward awardSub : awardsSub) {
-				Producer producerAwardSub = awardSub.getMovie().getProducer();
 
-				if (!awardSub.getId().equals(award.getId()) && producerAwardSub.equals(producerAward)) {
-
-					Integer interval = awardSub.getYear() - award.getYear();
-
-					IntervalAwardDTO intervalAwardDTO = new IntervalAwardDTO(producerAward.getName(), interval,
-							award.getYear(), awardSub.getYear());
-
-					if (!mapIntervalAwards.containsKey(interval)) {
-						List<IntervalAwardDTO> intervals = new ArrayList<IntervalAwardDTO>();
-						intervals.add(intervalAwardDTO);
-						
-						mapIntervalAwards.put(interval,  intervals);
-					} else {
-						List<IntervalAwardDTO> intervals = mapIntervalAwards.get(interval);
-						intervals.add(intervalAwardDTO);
-
-						mapIntervalAwards.put(interval,  intervals);
-					}
+				for (MovieProducer movieProducer : award.getMovie().getMovieProducers()) {
 					
-					break;
+					Producer producerAward = movieProducer.getProducer();
+					
+					for (MovieProducer movieProducerSub : awardSub.getMovie().getMovieProducers()) {
+						Producer producerAwardSub = movieProducerSub.getProducer();
+
+						if (producerAward.equals(producerAwardSub)) {
+
+							Integer interval = awardSub.getYear() - award.getYear();
+
+							IntervalAwardDTO intervalAwardDTO = new IntervalAwardDTO(producerAward.getName(), interval,
+									award.getYear(), awardSub.getYear());
+
+							if (!mapIntervalAwards.containsKey(interval)) {
+								List<IntervalAwardDTO> intervals = new ArrayList<IntervalAwardDTO>();
+								intervals.add(intervalAwardDTO);
+								
+								mapIntervalAwards.put(interval,  intervals);
+							} else {
+								List<IntervalAwardDTO> intervals = mapIntervalAwards.get(interval);
+								intervals.add(intervalAwardDTO);
+
+								mapIntervalAwards.put(interval,  intervals);
+							}
+							
+							break;
+
+						}
+						
+					}
 
 				}
 			}
@@ -159,10 +172,16 @@ public class GoldenRaspberryAwardService {
 		return mapIntervalAwards.get(lastElement);
 	}
 	
-	private Producer saveProducer(MovieBean movieBean) {
-		Producer producer = producerService.convertMovieBeanToProducer(movieBean);
+	private List<Producer> saveProducer(MovieBean movieBean) {
+		List<Producer> producersSave = new ArrayList<Producer>();
+		
+		List<Producer> producersConverted = producerService.convertMovieBeanToProducer(movieBean);
 
-		return producerService.insertIfNotExists(producer);
+		producersConverted.stream().forEach(producer -> {
+			producersSave.add(producerService.insertIfNotExists(producer));
+		});
+		
+		return producersSave;
 	}
 
 	private Studio saveStudio(MovieBean movieBean) {
@@ -171,12 +190,15 @@ public class GoldenRaspberryAwardService {
 		return studioService.insertIfNotExists(studio);
 	}
 
-	private Movie saveMovie(MovieBean movieBean, Producer producer, Studio studio) {
+	private Movie saveMovie(MovieBean movieBean, List<Producer> producers, Studio studio) {
 		Movie movie = movieService.convertMovieBeanToMovie(movieBean);
-		movie.setProducer(producer);
 		movie.setStudio(studio);
 
-		return movieService.insertIfNotExists(movie);
+		movie = movieService.insertIfNotExists(movie);
+
+		movieProducerService.insertIfNotExists(movie, producers);
+
+		return movie;
 	}
 
 	private void saveGoldenRaspberryAward(MovieBean movieBean, Movie movie) {

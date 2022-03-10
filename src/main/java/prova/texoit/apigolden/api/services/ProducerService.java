@@ -1,5 +1,9 @@
 package prova.texoit.apigolden.api.services;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,13 +29,25 @@ public class ProducerService {
 		return producer;
 	}
 
-	public Producer convertMovieBeanToProducer(MovieBean movieBean) {
+	public List<Producer> convertMovieBeanToProducer(MovieBean movieBean) {
+		List<Producer> producers = new ArrayList<Producer>();
+		
+		List<String> namesProducersWithAnd = Arrays.asList(movieBean.getProducers().split(","));
 
-		Producer producer = new Producer();
+		List<String> namesProducers = new ArrayList<String>();
 
-		producer.setName(movieBean.getProducers());
+		namesProducersWithAnd.stream().forEach((name) -> {
+			namesProducers.addAll(Arrays.asList(name.split("and")));
+		});
 
-		return producer;
+		namesProducers.stream().forEach(name -> {
+			Producer producer = new Producer();
+			producer.setName(name.trim());
+			producers.add(producer);
+		});
+
+		return producers;
 	}
+	
 
 }

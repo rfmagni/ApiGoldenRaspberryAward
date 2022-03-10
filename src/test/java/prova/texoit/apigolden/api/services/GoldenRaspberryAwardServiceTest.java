@@ -3,6 +3,9 @@ package prova.texoit.apigolden.api.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +16,18 @@ import org.springframework.test.context.ActiveProfiles;
 
 import prova.texoit.apigolden.api.builder.GoldenRaspberryAwardBuilder;
 import prova.texoit.apigolden.api.builder.MovieBuilder;
+import prova.texoit.apigolden.api.builder.MovieProducerBuilder;
 import prova.texoit.apigolden.api.builder.ProducerBuilder;
 import prova.texoit.apigolden.api.builder.StudioBuilder;
 import prova.texoit.apigolden.api.dto.IntervalAwardDTO;
 import prova.texoit.apigolden.api.dto.IntervalGoldenRaspberryAwardDTO;
 import prova.texoit.apigolden.api.entities.GoldenRaspberryAward;
 import prova.texoit.apigolden.api.entities.Movie;
+import prova.texoit.apigolden.api.entities.MovieProducer;
 import prova.texoit.apigolden.api.entities.Producer;
 import prova.texoit.apigolden.api.entities.Studio;
 import prova.texoit.apigolden.api.repository.GoldenRaspberryAwardRepository;
+import prova.texoit.apigolden.api.repository.MovieProducerRepository;
 import prova.texoit.apigolden.api.repository.MovieRepository;
 import prova.texoit.apigolden.api.repository.ProducerRepository;
 import prova.texoit.apigolden.api.repository.StudioRepository;
@@ -40,6 +46,9 @@ public class GoldenRaspberryAwardServiceTest {
 
 	@Autowired
 	private MovieRepository movieRepository;
+	
+	@Autowired
+	private MovieProducerRepository movieProducerRepository;
 	
 	@Autowired
 	private GoldenRaspberryAwardRepository goldenRaspberryAwardRepository;
@@ -119,7 +128,7 @@ public class GoldenRaspberryAwardServiceTest {
 	
 	@Test
 	@Order(3)
-	public void deve_retornar_premios_no_intervalo_minimo_maximo_quando_existir_filmes_intervalos_diferentes_mesmo_intervalo () {
+	public void deve_retornar_premios_no_intervalo_minimo_maximo_quando_existir_filmes_intervalos_diferentes () {
 		Studio studioCannon = createStudio("Cannon Films");
 		
 		Producer producerJohn = createProducer("John");
@@ -129,19 +138,19 @@ public class GoldenRaspberryAwardServiceTest {
 		Movie movieJohn1989 = createMovie("John 1989", producerJohn, studioCannon, 1989);
 		createGoldenRaspberryAward(movieJohn1989, 1989);
 		
-		Producer producerDerek = createProducer("Bo Derek");
-		Movie movieBoleto = createMovie("Boleto", producerDerek, studioCannon, 1984);
-		createGoldenRaspberryAward(movieBoleto, 1984);
+		Producer producerJoel = createProducer("Joel Silver");
+		Movie movieAdventures = createMovie("The Adventures of Ford Fairlane", producerJoel, studioCannon, 1990);
+		createGoldenRaspberryAward(movieAdventures, 1990);
 		
-		Movie movieAvatar = createMovie("Avatar", producerDerek, studioCannon, 1985);
-		createGoldenRaspberryAward(movieAvatar, 1985);
+		Movie movieHudson = createMovie("Hudson Hawk", producerJoel, studioCannon, 1991);
+		createGoldenRaspberryAward(movieHudson, 1991);
 
-		Producer producerMax = createProducer("Max");
-		Movie movieJohn1995  = createMovie("Max 1995", producerMax, studioCannon, 1995);
-		createGoldenRaspberryAward(movieJohn1995, 1995);
+		Producer producerMatthew = createProducer("Matthew Vaughn");
+		Movie movieSwept  = createMovie("Swept Away", producerMatthew, studioCannon, 2002);
+		createGoldenRaspberryAward(movieSwept, 2002);
 		
-		Movie movieJohn2000 = createMovie("Max 2000", producerMax, studioCannon, 2000);
-		createGoldenRaspberryAward(movieJohn2000, 2000);
+		Movie movieFantastic = createMovie("Fantastic Four", producerMatthew, studioCannon, 2015);
+		createGoldenRaspberryAward(movieFantastic, 2015);
 	
 		IntervalGoldenRaspberryAwardDTO intervalAwards = goldenRaspberryAwardService.findIntervalAward();
 		
@@ -152,8 +161,8 @@ public class GoldenRaspberryAwardServiceTest {
 		IntervalAwardDTO intervalMinAward1 = intervalAwards.getIntervalsMin().get(0);
 		IntervalAwardDTO intervalMaxAward1 = intervalAwards.getIntervalsMax().get(0);
 		
-		assertEquals(intervalMinAward1.getProducer(), producerDerek.getName());
-		assertEquals(intervalMaxAward1.getProducer(), producerMax.getName());
+		assertEquals(intervalMinAward1.getProducer(), producerJoel.getName());
+		assertEquals(intervalMaxAward1.getProducer(), producerMatthew.getName());
 	}
 
 	private Producer createProducer(String name) {
@@ -180,12 +189,20 @@ public class GoldenRaspberryAwardServiceTest {
 		MovieBuilder builder = new MovieBuilder();
 
 		Movie movie = builder.withName(name)
-				.withProducer(producer)
 				.withStudio(studio)
 				.withYear(year)
 				.build();
 		
 		movie = movieRepository.save(movie);
+		
+		MovieProducer movieProducer = new MovieProducerBuilder().withMovie(movie).withProducer(producer).build();
+		
+		movieProducer = movieProducerRepository.save(movieProducer);
+		
+		List<MovieProducer> movierProducers = new ArrayList<MovieProducer>();
+		movierProducers.add(movieProducer);
+		
+		movie.setMovieProducers(movierProducers);
 
 		return movie;
 	}
@@ -202,5 +219,4 @@ public class GoldenRaspberryAwardServiceTest {
 		return goldenRaspberryAward;
 	}
 	
-
 }

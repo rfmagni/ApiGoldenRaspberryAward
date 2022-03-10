@@ -1,7 +1,9 @@
 package prova.texoit.apigolden.api.builder;
 
+import java.util.List;
+
 import prova.texoit.apigolden.api.entities.Movie;
-import prova.texoit.apigolden.api.entities.Producer;
+import prova.texoit.apigolden.api.entities.MovieProducer;
 import prova.texoit.apigolden.api.entities.Studio;
 
 public class MovieBuilder {
@@ -13,8 +15,8 @@ public class MovieBuilder {
 		return this;
 	}
 
-	public MovieBuilder withProducer(Producer producer) {
-		movie.setProducer(producer);
+	public MovieBuilder withMovieProducers(List<MovieProducer> movieProducers) {
+		movie.setMovieProducers(movieProducers);
 		return this;
 	}
 

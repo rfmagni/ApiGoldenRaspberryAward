@@ -1,13 +1,16 @@
 package prova.texoit.apigolden.api.entities;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -23,13 +26,13 @@ public class Movie {
 	private String name;
 
 	@ManyToOne
-	private Producer producer;
-
-	@ManyToOne
 	private Studio studio;
 
 	@Column(nullable = false)
 	private Integer year;
+
+	@OneToMany(mappedBy = "movie", fetch = FetchType.EAGER)
+	private List<MovieProducer> movieProducers;
 
 	public Movie() {
 
@@ -55,14 +58,6 @@ public class Movie {
 		this.id = id;
 	}
 
-	public Producer getProducer() {
-		return producer;
-	}
-
-	public void setProducer(Producer producer) {
-		this.producer = producer;
-	}
-
 	public Studio getStudio() {
 		return studio;
 	}
@@ -77,6 +72,14 @@ public class Movie {
 
 	public void setYear(Integer year) {
 		this.year = year;
+	}
+
+	public List<MovieProducer> getMovieProducers() {
+		return movieProducers;
+	}
+
+	public void setMovieProducers(List<MovieProducer> movieProducers) {
+		this.movieProducers = movieProducers;
 	}
 
 	@Override
